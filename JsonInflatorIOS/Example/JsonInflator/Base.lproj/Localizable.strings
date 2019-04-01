@@ -11,4 +11,4 @@
 "MAIN_SERVER_ADDRESS" = "Server address";
 "MAIN_SERVER_ADDRESS_PLACEHOLDER" = "URL";
 "MAIN_PLAYGROUND_BUTTON" = "Open playground";
-"MAIN_SERVER_FAILED" = "Can't load or update layout_main.json, make sure the viewlet server is running, is reachable, and the address is correct.";
+"MAIN_SERVER_FAILED" = "Can't load or update layout_main.json, make sure the JSON server is running, is reachable, and the address is correct.";
