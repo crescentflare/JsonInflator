@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Example JSON inflator</string>
     <string name="main_title">JSON inflator example</string>
-    <string name="main_message">Example application demonstrating layouts created with inflatable viewlets and JSON. Configure the server below for real-time prototyping.</string>
+    <string name="main_message">Example application demonstrating layouts created with inflatable viewlets and JSON. Configure the server below for real-time prototyping.\n\nPress done on the keyboard to apply the server address after typing it in.</string>
     <string name="main_server_check">Server enabled</string>
     <string name="main_polling_check">Polling enabled</string>
     <string name="main_server_address">Server address</string>
