@@ -1,0 +1,12 @@
+use_frameworks!
+
+platform :ios, '8.0'
+
+target 'JsonInflator_Example' do
+  pod 'JsonInflator', :path => '../../'
+  pod 'Alamofire', '~> 4.8.1'
+
+  target 'JsonInflator_Tests' do
+    inherit! :search_paths
+  end
+end
