@@ -243,14 +243,9 @@ public class JsonInflator
             inflatedItem = inflate(context, processedNewItem, parent, binder);
         }
 
-        // Bind reference and add item to result
+        // Add item to result
         if (inflatedItem != null && processedNewItem != null)
         {
-            String refId = mapUtil.optionalString(processedNewItem, "refId", null);
-            if (refId != null && binder != null)
-            {
-                binder.onBind(refId, inflatedItem);
-            }
             result.addItem(inflatedItem, processedNewItem, inflatedItem == currentItem);
         }
         return result;
@@ -293,11 +288,6 @@ public class JsonInflator
                 }
                 if (inflatedItem != null)
                 {
-                    String refId = mapUtil.optionalString(newItem, "refId", null);
-                    if (refId != null && binder != null)
-                    {
-                        binder.onBind(refId, inflatedItem);
-                    }
                     result.addItem(inflatedItem, newItem, recycled);
                 }
             }
@@ -322,11 +312,6 @@ public class JsonInflator
                 Object inflatedItem = inflate(context, newItem, parent, binder);
                 if (inflatedItem != null)
                 {
-                    String refId = mapUtil.optionalString(newItem, "refId", null);
-                    if (refId != null && binder != null)
-                    {
-                        binder.onBind(refId, inflatedItem);
-                    }
                     result.addItem(inflatedItem, newItem, false);
                 }
             }
