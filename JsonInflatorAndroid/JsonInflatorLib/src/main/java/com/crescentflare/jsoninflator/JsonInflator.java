@@ -6,6 +6,7 @@ import com.crescentflare.jsoninflator.binder.InflatorBinder;
 import com.crescentflare.jsoninflator.utility.InflatorColorLookup;
 import com.crescentflare.jsoninflator.utility.InflatorDimensionLookup;
 import com.crescentflare.jsoninflator.utility.InflatorMapUtil;
+import com.crescentflare.jsoninflator.utility.InflatorNestedResult;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -223,6 +224,115 @@ public class JsonInflator
     // --
     // Nested inflation utilities
     // --
+
+    @NotNull
+    public InflatorNestedResult inflateNestedItem(@NotNull Context context, @NotNull Object currentItem, @Nullable Object newItem, boolean enableRecycling, @Nullable Object parent, @Nullable InflatorBinder binder)
+    {
+        // Recycle or inflate new item
+        InflatorNestedResult result = new InflatorNestedResult();
+        Map<String, Object> processedNewItem = attributesForNestedInflatable(newItem);
+        Object inflatedItem;
+        if (enableRecycling && canRecycle(currentItem, processedNewItem))
+        {
+            inflateOn(currentItem, processedNewItem, parent, binder);
+            inflatedItem = currentItem;
+        }
+        else
+        {
+            result.addRemovedItem(currentItem);
+            inflatedItem = inflate(context, processedNewItem, parent, binder);
+        }
+
+        // Bind reference and add item to result
+        if (inflatedItem != null && processedNewItem != null)
+        {
+            String refId = mapUtil.optionalString(processedNewItem, "refId", null);
+            if (refId != null && binder != null)
+            {
+                binder.onBind(refId, inflatedItem);
+            }
+            result.addItem(inflatedItem, processedNewItem, inflatedItem == currentItem);
+        }
+        return result;
+    }
+
+    @NotNull
+    public InflatorNestedResult inflateNestedItemList(@NotNull Context context, List<Object> currentItems, @Nullable Object newItems, boolean enableRecycling, @Nullable Object parent, @Nullable InflatorBinder binder)
+    {
+        InflatorNestedResult result = new InflatorNestedResult();
+        List<Map<String, Object>> processedNewItems = attributesForNestedInflatableList(newItems);
+        if (enableRecycling)
+        {
+            // Add or recycle items
+            int recycleIndex = 0;
+            for (Map<String, Object> newItem : processedNewItems)
+            {
+                // Search for a current item to recycle (use an index to maintain ordering)
+                boolean recycled = false;
+                Object inflatedItem = null;
+                for (int index = recycleIndex; index < currentItems.size(); index++)
+                {
+                    if (canRecycle(currentItems.get(index), newItem))
+                    {
+                        for (int removeIndex = recycleIndex; removeIndex < index; removeIndex++)
+                        {
+                            result.addRemovedItem(currentItems.get(removeIndex));
+                        }
+                        recycleIndex = index + 1;
+                        inflatedItem = currentItems.get(index);
+                        inflateOn(currentItems.get(index), newItem, parent, binder);
+                        recycled = true;
+                        break;
+                    }
+                }
+
+                // If no candidate was found, create a new item
+                if (!recycled)
+                {
+                    inflatedItem = inflate(context, newItem, parent, binder);
+                }
+                if (inflatedItem != null)
+                {
+                    String refId = mapUtil.optionalString(newItem, "refId", null);
+                    if (refId != null && binder != null)
+                    {
+                        binder.onBind(refId, inflatedItem);
+                    }
+                    result.addItem(inflatedItem, newItem, recycled);
+                }
+            }
+
+            // Set remaining items for removal
+            for (int index = recycleIndex; index < currentItems.size(); index++)
+            {
+                result.addRemovedItem(currentItems.get(index));
+            }
+        }
+        else
+        {
+            // First mark all current items as removed
+            for (Object item : currentItems)
+            {
+                result.addRemovedItem(item);
+            }
+
+            // Create new items
+            for (Map<String, Object> newItem : processedNewItems)
+            {
+                Object inflatedItem = inflate(context, newItem, parent, binder);
+                if (inflatedItem != null)
+                {
+                    String refId = mapUtil.optionalString(newItem, "refId", null);
+                    if (refId != null && binder != null)
+                    {
+                        binder.onBind(refId, inflatedItem);
+                    }
+                    result.addItem(inflatedItem, newItem, false);
+                }
+            }
+        }
+        return result;
+    }
 
     @Nullable
     public Map<String, Object> attributesForNestedInflatable(@Nullable Object nestedInflatableItem)
