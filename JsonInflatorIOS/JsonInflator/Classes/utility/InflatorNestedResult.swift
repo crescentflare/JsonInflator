@@ -22,34 +22,34 @@ public class InflatorNestedResult {
     // MARK: Access result
     // --
 
-    var items: [Any] {
+    public var items: [Any] {
         get {
             return internalItems
         }
     }
 
-    var removedItems: [Any] {
+    public var removedItems: [Any] {
         get {
             return internalRemovedItems
         }
     }
     
-    func isRecycled(item: Any) -> Bool {
+    public func isRecycled(item: Any) -> Bool {
         return isRecycled(index: internalItems.firstIndex { $0 as AnyObject === item as AnyObject } ?? -1)
     }
     
-    func isRecycled(index: Int) -> Bool {
+    public func isRecycled(index: Int) -> Bool {
         if index >= 0 && index < internalItems.count && index < itemRecycled.count {
             return itemRecycled[index]
         }
         return false
     }
     
-    func getAttributes(item: Any) -> [String: Any] {
+    public func getAttributes(item: Any) -> [String: Any] {
         return getAttributes(index: internalItems.firstIndex { $0 as AnyObject === item as AnyObject } ?? -1)
     }
     
-    func getAttributes(index: Int) -> [String: Any] {
+    public func getAttributes(index: Int) -> [String: Any] {
         if index >= 0 && index < internalItems.count && index < itemAttributes.count {
             return itemAttributes[index]
         }
