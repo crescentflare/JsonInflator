@@ -175,7 +175,7 @@ open class JsonInflator {
         return result
     }
 
-    public func inflateNestedItems(currentItems: [Any], newItems: Any?, enableRecycling: Bool, parent: Any? = nil, binder: InflatorBinder?) -> InflatorNestedResult {
+    public func inflateNestedItemList(currentItems: [Any], newItems: Any?, enableRecycling: Bool, parent: Any? = nil, binder: InflatorBinder?) -> InflatorNestedResult {
         let result = InflatorNestedResult()
         let processedNewItems = attributesForNestedInflatableList(newItems)
         if enableRecycling {
