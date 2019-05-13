@@ -7,11 +7,13 @@ import android.widget.LinearLayout;
 import com.crescentflare.jsoninflator.JsonInflatable;
 import com.crescentflare.jsoninflator.binder.InflatorBinder;
 import com.crescentflare.jsoninflator.utility.InflatorMapUtil;
+import com.crescentflare.jsoninflator.utility.InflatorNestedResult;
 import com.crescentflare.jsoninflatorexample.ViewletCreator;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -33,57 +35,48 @@ public class LinearLayoutViewlet implements JsonInflatable
     {
         if (object instanceof LinearLayout)
         {
-            // Add or recycle children
+            // Collect child views from container
             LinearLayout container = (LinearLayout)object;
+            List<Object> allChildren = new ArrayList<>();
             int childCount = container.getChildCount();
-            int currentViewChild = 0;
-            List<Map<String, Object>> children = ViewletCreator.instance.attributesForNestedInflatableList(attributes.get("children"));
-            for (int i = 0; i < children.size(); i++)
+            for (int i = 0; i < childCount; i++)
             {
-                Map<String, Object> child = children.get(i);
-                if (currentViewChild < childCount && ViewletCreator.instance.canRecycle(container.getChildAt(currentViewChild), child))
+                allChildren.add(container.getChildAt(i));
+            }
+
+            // Inflate
+            List<Map<String, Object>> newChildren = ViewletCreator.instance.attributesForNestedInflatableList(attributes.get("children"));
+            InflatorNestedResult result = ViewletCreator.instance.inflateNestedItemList(container.getContext(), allChildren, newChildren, true, container, binder);
+
+            // Remove views that could not be recycled
+            for (Object removeItem : result.getRemovedItems())
+            {
+                if (removeItem instanceof View)
                 {
-                    ViewletCreator.instance.inflateOn(container.getChildAt(currentViewChild), child, container, binder);
-                    ViewViewlet.applyLayoutAttributes(mapUtil, container.getChildAt(currentViewChild), child);
-                    if (binder != null)
-                    {
-                        String refId = mapUtil.optionalString(child, "refId", null);
-                        if (refId != null)
-                        {
-                            binder.onBind(refId, container.getChildAt(currentViewChild));
-                        }
-                    }
-                    currentViewChild++;
-                }
-                else
-                {
-                    if (currentViewChild < childCount)
-                    {
-                        container.removeViewAt(currentViewChild);
-                        childCount--;
-                    }
-                    Object createdObject = ViewletCreator.instance.inflate(container.getContext(), child, container);
-                    if (createdObject instanceof View)
-                    {
-                        View createdView = (View)createdObject;
-                        container.addView(createdView, currentViewChild);
-                        ViewViewlet.applyLayoutAttributes(mapUtil, createdView, child);
-                        if (binder != null)
-                        {
-                            String refId = mapUtil.optionalString(child, "refId", null);
-                            if (refId != null)
-                            {
-                                binder.onBind(refId, createdView);
-                            }
-                        }
-                        currentViewChild++;
-                        childCount++;
-                    }
+                    container.removeView((View)removeItem);
                 }
             }
-            for (int i = childCount - 1; i >= currentViewChild; i--)
+
+            // Add or update views that are new or could be recycled
+            for (int i = 0; i < result.getItems().size(); i++)
             {
-                container.removeViewAt(i);
+                Object item = result.getItems().get(i);
+                if (item instanceof View)
+                {
+                    if (!result.isRecycled(i))
+                    {
+                        container.addView((View)item, i);
+                    }
+                    ViewViewlet.applyLayoutAttributes(mapUtil, (View)item, result.getAttributes(i));
+                    if (binder != null)
+                    {
+                        String refId = mapUtil.optionalString(result.getAttributes(i), "refId", null);
+                        if (refId != null)
+                        {
+                            binder.onBind(refId, item);
+                        }
+                    }
+                }
             }
 
             // Standard view attributes

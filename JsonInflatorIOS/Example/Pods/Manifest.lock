@@ -1,6 +1,6 @@
 PODS:
   - Alamofire (4.8.1)
-  - JsonInflator (0.6.0)
+  - JsonInflator (0.6.1)
 
 DEPENDENCIES:
   - Alamofire (~> 4.8.1)
@@ -16,8 +16,8 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Alamofire: 16ce2c353fb72865124ddae8a57c5942388f4f11
-  JsonInflator: 757fd4764dfe5aa93e4c86dff52a5edb66b5d2a3
+  JsonInflator: 0880a67abd81be631353434017a4a4ae4ef367b2
 
 PODFILE CHECKSUM: 390029039d727ed6d4cffed51e8e2c7f3bfea8e4
 
-COCOAPODS: 1.7.0.beta.2
+COCOAPODS: 1.7.0.rc.1

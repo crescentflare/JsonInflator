@@ -26,44 +26,38 @@ class UIViewContainerViewlet: JsonInflatable {
     
     func update(convUtil: InflatorConvUtil, object: Any, attributes: [String: Any], parent: Any?, binder: InflatorBinder?) -> Bool {
         if let container = object as? UIViewContainer {
-            // Add or recycle subviews
-            var createdSubviews = 0
-            var views = container.subviews
-            let internalBinder = InflatorDictBinder()
+            // First clear all constraints
             removeViewletConstraints(view: container, constraints: container.constraints)
-            let subviews = ViewletCreator.shared.attributesForNestedInflatableList(attributes["subviews"])
-            for i in 0..<subviews.count {
-                let subview = subviews[i]
-                if i < views.count && ViewletCreator.shared.canRecycle(object: views[i], attributes: subview) {
-                    removeViewletConstraints(view: views[i], constraints: views[i].constraints)
-                    ViewletCreator.shared.inflate(onObject: views[i], attributes: subview, parent: container, binder: binder)
-                    if let refId = subview["refId"] as? String {
-                        internalBinder.onBind(refId: refId, object: views[i])
-                        if binder != nil {
-                            binder?.onBind(refId: refId, object: views[i])
-                        }
-                    }
-                    createdSubviews += 1
-                } else {
-                    if i < views.count {
-                        views[i].removeFromSuperview()
-                    }
-                    if let createdSubview = ViewletCreator.shared.inflate(attributes: subview, parent: container, binder: binder) as? UIView {
-                        container.insertSubview(createdSubview, at: createdSubviews)
-                        if let refId = subview["refId"] as? String {
-                            internalBinder.onBind(refId: refId, object: createdSubview)
-                            if binder != nil {
-                                binder?.onBind(refId: refId, object: createdSubview)
-                            }
-                        }
-                        createdSubviews += 1
-                    }
+            for view in container.subviews {
+                removeViewletConstraints(view: view, constraints: view.constraints)
+            }
+
+            // Inflate
+            let newSubviews = ViewletCreator.shared.attributesForNestedInflatableList(attributes["subviews"])
+            let result = ViewletCreator.shared.inflateNestedItemList(currentItems: container.subviews, newItems: newSubviews, enableRecycling: true, parent: container, binder: binder)
+
+            // Remove views that could not be recycled
+            for removeItem in result.removedItems {
+                if let subview = removeItem as? UIView {
+                    removeViewletConstraints(view: subview, constraints: subview.constraints)
+                    subview.removeFromSuperview()
                 }
             }
-            createdSubviews = subviews.count
-            views = container.subviews
-            for i in stride(from: createdSubviews, to: views.count, by: 1) {
-                views[i].removeFromSuperview()
+
+            // Add or update views that are new or could be recycled
+            let internalBinder = InflatorDictBinder()
+            for i in result.items.indices {
+                if let view = result.items[i] as? UIView {
+                    if !result.isRecycled(index: i) {
+                        container.insertSubview(view, at: i)
+                    }
+                    if let refId = result.getAttributes(index: i)["refId"] as? String {
+                        internalBinder.onBind(refId: refId, object: view)
+                        if binder != nil {
+                            binder?.onBind(refId: refId, object: view)
+                        }
+                    }
+                }
             }
             
             // Apply constraints to subviews

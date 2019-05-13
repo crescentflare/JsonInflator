@@ -153,6 +153,80 @@ open class JsonInflator {
     // MARK: Nested inflation utilities
     // --
     
+    public func inflateNestedItem(currentItem: Any, newItem: Any?, enableRecycling: Bool, parent: Any? = nil, binder: InflatorBinder?) -> InflatorNestedResult {
+        // Recycle or inflate new item
+        let result = InflatorNestedResult()
+        let processedNewItem = attributesForNestedInflatable(newItem)
+        var inflatedItem: Any?
+        if enableRecycling && canRecycle(object: currentItem, attributes: processedNewItem) {
+            inflate(onObject: currentItem, attributes: processedNewItem, parent: parent, binder: binder)
+            inflatedItem = currentItem
+        } else {
+            result.addRemovedItem(currentItem)
+            if let processedNewItem = processedNewItem {
+                inflatedItem = inflate(attributes: processedNewItem, parent: parent, binder: binder)
+            }
+        }
+        
+        // Add item to result
+        if let inflatedItem = inflatedItem, let newItem = processedNewItem {
+            result.addItem(inflatedItem, attributes: newItem, recycled: inflatedItem as AnyObject === currentItem as AnyObject)
+        }
+        return result
+    }
+
+    public func inflateNestedItemList(currentItems: [Any], newItems: Any?, enableRecycling: Bool, parent: Any? = nil, binder: InflatorBinder?) -> InflatorNestedResult {
+        let result = InflatorNestedResult()
+        let processedNewItems = attributesForNestedInflatableList(newItems)
+        if enableRecycling {
+            // Add or recycle items
+            var recycleIndex = 0
+            for newItem in processedNewItems {
+                // Search for a current item to recycle (use an index to maintain order)
+                var recycled = false
+                var inflatedItem: Any?
+                for index in recycleIndex..<currentItems.count {
+                    if canRecycle(object: currentItems[index], attributes: newItem) {
+                        for removeIndex in recycleIndex..<index {
+                            result.addRemovedItem(currentItems[removeIndex])
+                        }
+                        recycleIndex = index + 1
+                        inflatedItem = currentItems[index]
+                        inflate(onObject: currentItems[index], attributes: newItem, parent: parent, binder: binder)
+                        recycled = true
+                        break
+                    }
+                }
+                
+                // If no candidate was found, create a new item
+                if !recycled {
+                    inflatedItem = inflate(attributes: newItem, parent: parent, binder: binder)
+                }
+                if let inflatedItem = inflatedItem {
+                    result.addItem(inflatedItem, attributes: newItem, recycled: recycled)
+                }
+            }
+            
+            // Set remaining items for removal
+            for index in recycleIndex..<currentItems.count {
+                result.addRemovedItem(currentItems[index])
+            }
+        } else {
+            // First mark all current items as removed
+            for item in currentItems {
+                result.addRemovedItem(item)
+            }
+            
+            // Create new items
+            for newItem in processedNewItems {
+                if let inflatedItem = inflate(attributes: newItem, parent: parent, binder: binder) {
+                    result.addItem(inflatedItem, attributes: newItem, recycled: false)
+                }
+            }
+        }
+        return result
+    }
+
     public func attributesForNestedInflatable(_ nestedInflatableItem: Any?) -> [String: Any]? {
         if let attributes = nestedInflatableItem as? [String: Any] {
             if let inflatableName = findInflatableNameInAttributes(attributes) {

@@ -60,9 +60,11 @@ class PlaygroundViewController: UIViewController, LiveJsonDelegate {
     // --
     
     func layoutLoaded(jsonData: [String: Any]) {
-        let binder = InflatorDictBinder()
-        ViewletCreator.shared.inflate(onObject: view, attributes: jsonData, binder: binder)
-        view.backgroundColor = UIColor(white: 1, alpha: 1)
+        if let view = view {
+            let binder = InflatorDictBinder()
+            ViewletCreator.shared.inflate(onObject: view, attributes: jsonData, binder: binder)
+            view.backgroundColor = UIColor(white: 1, alpha: 1)
+        }
     }
 
     
