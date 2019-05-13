@@ -226,6 +226,12 @@ public class JsonInflator
     // --
 
     @NotNull
+    public InflatorNestedResult inflateNestedItem(@NotNull Context context, @NotNull Object currentItem, @Nullable Object newItem, boolean enableRecycling, @Nullable Object parent)
+    {
+        return inflateNestedItem(context, currentItem, newItem, enableRecycling, parent, null);
+    }
+
+    @NotNull
     public InflatorNestedResult inflateNestedItem(@NotNull Context context, @NotNull Object currentItem, @Nullable Object newItem, boolean enableRecycling, @Nullable Object parent, @Nullable InflatorBinder binder)
     {
         // Recycle or inflate new item
@@ -249,6 +255,12 @@ public class JsonInflator
             result.addItem(inflatedItem, processedNewItem, inflatedItem == currentItem);
         }
         return result;
+    }
+
+    @NotNull
+    public InflatorNestedResult inflateNestedItemList(@NotNull Context context, List<Object> currentItems, @Nullable Object newItems, boolean enableRecycling, @Nullable Object parent)
+    {
+        return inflateNestedItemList(context, currentItems, newItems, enableRecycling, parent, null);
     }
 
     @NotNull
