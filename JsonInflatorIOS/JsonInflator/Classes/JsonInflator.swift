@@ -153,16 +153,18 @@ open class JsonInflator {
     // MARK: Nested inflation utilities
     // --
     
-    public func inflateNestedItem(currentItem: Any, newItem: Any?, enableRecycling: Bool, parent: Any? = nil, binder: InflatorBinder?) -> InflatorNestedResult {
+    public func inflateNestedItem(currentItem: Any?, newItem: Any?, enableRecycling: Bool, parent: Any? = nil, binder: InflatorBinder?) -> InflatorNestedResult {
         // Recycle or inflate new item
         let result = InflatorNestedResult()
         let processedNewItem = attributesForNestedInflatable(newItem)
         var inflatedItem: Any?
-        if enableRecycling && canRecycle(object: currentItem, attributes: processedNewItem) {
+        if let currentItem = currentItem, enableRecycling && canRecycle(object: currentItem, attributes: processedNewItem) {
             inflate(onObject: currentItem, attributes: processedNewItem, parent: parent, binder: binder)
             inflatedItem = currentItem
         } else {
-            result.addRemovedItem(currentItem)
+            if let currentItem = currentItem {
+                result.addRemovedItem(currentItem)
+            }
             if let processedNewItem = processedNewItem {
                 inflatedItem = inflate(attributes: processedNewItem, parent: parent, binder: binder)
             }
