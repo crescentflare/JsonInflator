@@ -27,7 +27,7 @@ For iOS this library is only available from Swift 5.0 and onwards. Older Swift v
 The library is available through [CocoaPods](http://cocoapods.org). To install it, simply add the following line to your Podfile:
 
 ```ruby
-pod "JsonInflator", '~> 0.6.1'
+pod "JsonInflator", '~> 0.6.2'
 ```
 
 
@@ -36,7 +36,7 @@ pod "JsonInflator", '~> 0.6.1'
 When using gradle, the library can easily be imported into the build.gradle file of your project. Add the following dependency:
 
 ```
-implementation 'com.crescentflare.jsoninflator:JsonInflatorLib:0.6.1'
+implementation 'com.crescentflare.jsoninflator:JsonInflatorLib:0.6.2'
 ```
 
 Make sure that jcenter is added as a repository.
