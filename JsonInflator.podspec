@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'JsonInflator'
-  s.version          = '0.6.1'
+  s.version          = '0.6.2'
   s.swift_version    = '5.0'
   s.summary          = 'JsonInflator creates objects and classes from JSON for both Android and iOS.'
 
