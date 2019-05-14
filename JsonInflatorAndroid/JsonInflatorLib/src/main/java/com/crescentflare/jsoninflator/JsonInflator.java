@@ -226,27 +226,33 @@ public class JsonInflator
     // --
 
     @NotNull
-    public InflatorNestedResult inflateNestedItem(@NotNull Context context, @NotNull Object currentItem, @Nullable Object newItem, boolean enableRecycling, @Nullable Object parent)
+    public InflatorNestedResult inflateNestedItem(@NotNull Context context, @Nullable Object currentItem, @Nullable Object newItem, boolean enableRecycling, @Nullable Object parent)
     {
         return inflateNestedItem(context, currentItem, newItem, enableRecycling, parent, null);
     }
 
     @NotNull
-    public InflatorNestedResult inflateNestedItem(@NotNull Context context, @NotNull Object currentItem, @Nullable Object newItem, boolean enableRecycling, @Nullable Object parent, @Nullable InflatorBinder binder)
+    public InflatorNestedResult inflateNestedItem(@NotNull Context context, @Nullable Object currentItem, @Nullable Object newItem, boolean enableRecycling, @Nullable Object parent, @Nullable InflatorBinder binder)
     {
         // Recycle or inflate new item
         InflatorNestedResult result = new InflatorNestedResult();
         Map<String, Object> processedNewItem = attributesForNestedInflatable(newItem);
-        Object inflatedItem;
-        if (enableRecycling && canRecycle(currentItem, processedNewItem))
+        Object inflatedItem = null;
+        if (currentItem != null && enableRecycling && canRecycle(currentItem, processedNewItem))
         {
             inflateOn(currentItem, processedNewItem, parent, binder);
             inflatedItem = currentItem;
         }
         else
         {
-            result.addRemovedItem(currentItem);
-            inflatedItem = inflate(context, processedNewItem, parent, binder);
+            if (currentItem != null)
+            {
+                result.addRemovedItem(currentItem);
+            }
+            if (processedNewItem != null)
+            {
+                inflatedItem = inflate(context, processedNewItem, parent, binder);
+            }
         }
 
         // Add item to result

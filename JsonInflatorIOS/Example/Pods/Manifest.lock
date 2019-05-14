@@ -1,6 +1,6 @@
 PODS:
   - Alamofire (4.8.1)
-  - JsonInflator (0.6.1)
+  - JsonInflator (0.6.2)
 
 DEPENDENCIES:
   - Alamofire (~> 4.8.1)
@@ -16,7 +16,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Alamofire: 16ce2c353fb72865124ddae8a57c5942388f4f11
-  JsonInflator: 0880a67abd81be631353434017a4a4ae4ef367b2
+  JsonInflator: a1d36ccd1c38d5604bc64752b6eb3ec0a94512f1
 
 PODFILE CHECKSUM: 390029039d727ed6d4cffed51e8e2c7f3bfea8e4
 
