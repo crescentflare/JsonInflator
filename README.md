@@ -3,13 +3,15 @@
 [![CI Status](http://img.shields.io/travis/crescentflare/JsonInflator.svg?style=flat)](https://travis-ci.org/crescentflare/JsonInflator)
 [![License](https://img.shields.io/cocoapods/l/JsonInflator.svg?style=flat)](http://cocoapods.org/pods/JsonInflator)
 [![Version](https://img.shields.io/cocoapods/v/JsonInflator.svg?style=flat)](http://cocoapods.org/pods/JsonInflator)
-[![Version](https://img.shields.io/bintray/v/crescentflare/maven/JsonInflatorLib.svg?style=flat)](https://bintray.com/crescentflare/maven/JsonInflatorLib)
+[![Version](https://img.shields.io/maven-central/v/com.crescentflare.jsoninflator/JsonInflatorLib.svg?style=flat)](https://repo1.maven.org/maven2/com/crescentflare/jsoninflator/JsonInflatorLib)
 
 JSON inflator is a project to allow the creation of any object (including layouts and view components) from JSON on both iOS and Android and is an evolution of [ViewletCreator](https://github.com/crescentflare/ViewletCreator). It provides a way to make development more modular and dynamic. The example demonstrates how to use JSON inflator to prototype user interfaces real-time on multiple devices simultaneously.
 
 Use the library together with [UniLayout](https://github.com/crescentflare/UniLayout) for simultaneous multi-platform development of UI on both iOS and Android.
 
 For iOS this library is only available from Swift 5.0 and onwards. Older Swift versions can still use ViewletCreator (if possible).
+
+⚠️ **Notice for Android developers**: JCenter plans to shut down in may 2021. To mitigate this, the JSON inflator library has moved to Maven Central from version 0.6.2 onwards. Make sure to update to the latest version in time.
 
 
 ### Features
